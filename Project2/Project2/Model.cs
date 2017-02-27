@@ -160,6 +160,7 @@ namespace Project2
                 }
 
 
+                long offset = 0;
                 //reading meshes
                 for (int i = 0; i < header.meshCount; i++)
                 {
@@ -176,14 +177,14 @@ namespace Project2
                     meshes[i].header.vertexStart = br.ReadInt32();
                     meshes[i].header.meshSize = br.ReadInt32();
 
-                    br.BaseStream.Seek((long)(SeekOrigin.Current + meshes[i].header.triangleOffset), SeekOrigin.Begin);
+                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.triangleOffset + offset), SeekOrigin.Begin);
 
                     meshes[i].triangleVertices = new int[meshes[i].header.triangleCount * 3];
 
                     for (int j = 0; j < meshes[i].header.triangleCount * 3; j++)
                         meshes[i].triangleVertices[j] = br.ReadInt32();
 
-                    br.BaseStream.Seek((long)(SeekOrigin.Current + meshes[i].header.skinOffset), SeekOrigin.Begin);
+                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.skinOffset + offset), SeekOrigin.Begin);
 
                     meshes[i].skins = new Skin[meshes[i].header.skinCount];
 
@@ -193,14 +194,37 @@ namespace Project2
                         meshes[i].skins[j].index = br.ReadInt32();
                     }
 
-                    br.BaseStream.Seek((long)(SeekOrigin.Current + meshes[i].header.textureVectorStart), SeekOrigin.Begin);
+                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.textureVectorStart + offset), SeekOrigin.Begin);
+
+                    meshes[i].textureCoordinates = new Vector2[meshes[i].header.vertexCount*2];
 
                     for (int j = 0; i < meshes[i].header.vertexCount * 2; i++)
                     {
                         meshes[i].textureCoordinates[0] = new Vector2(br.ReadSingle(), br.ReadSingle());
                     }
 
-                    br.BaseStream.Seek((long)SeekOrigin.Current + meshes[i].header.vertexStart, SeekOrigin.Begin);
+                    br.BaseStream.Seek(((long)SeekOrigin.Current) + meshes[i].header.vertexStart + offset, SeekOrigin.Begin);
+
+                    meshes[i].vertices = new Vertex[meshes[i].header.vertexCount * meshes[i].header.frameCount];
+
+                    for(int j = 0; j < meshes[i].header.vertexCount * meshes[i].header.frameCount; j++)
+                    {
+                        meshes[i].vertices[j].vertex.X = br.ReadInt16() * (1.0f / 64);
+                        meshes[i].vertices[j].vertex.Y = br.ReadInt16() * (1.0f / 64);
+                        meshes[i].vertices[j].vertex.Z = br.ReadInt16() * (1.0f / 64);
+
+                        meshes[i].vertices[j].normal = new byte[3];
+
+                        byte lat = br.ReadByte(), lng = br.ReadByte(); ;
+
+                        meshes[i].vertices[j].normal[0] = (byte)(Math.Cos(lat) * Math.Sin(lng));
+                        meshes[i].vertices[j].normal[1] = (byte)(Math.Sin(lat) * Math.Sin(lng));
+                        meshes[i].vertices[j].normal[2] = (byte)(Math.Cos(lng));
+                    }
+
+                    meshes[i].texture = -1;
+
+                    offset += meshes[i].header.meshSize;
                 }
 
             }
