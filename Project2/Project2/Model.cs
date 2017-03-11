@@ -104,7 +104,7 @@ namespace Project2
         public Model(string file)
         {
             this.file = file;
-            this.textures = new List<Texture2D>();
+            textures = new List<Texture2D>();
         }
 
         public void LoadModel()

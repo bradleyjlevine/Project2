@@ -44,13 +44,12 @@ namespace Project2
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            
             Console.WriteLine("Enter the name of the file: ");
             StreamReader fs = new StreamReader(Console.ReadLine());
 
             try
             {
-                int i = 0;
+                int i = 0, index = 0;
                 while(fs.Peek() > -1)
                 {
                     string file = fs.ReadLine();
@@ -58,6 +57,7 @@ namespace Project2
                     {
                         model[i] = new Model(file);
                         model[i].LoadModel();
+                        
                     }
                     else if(file.Contains(".skin"))
                     {
@@ -67,14 +67,24 @@ namespace Project2
                             string skinFile = skinFs.ReadLine();
                             if (!skinFile.StartsWith("tag_"))
                             {
+                                string name = skinFile.Remove(skinFile.LastIndexOf(','));
+
                                 skinFile = skinFile.Substring(skinFile.IndexOf(',') + 1);
                                 model[i].textures.Add(Model.LoadTexture(GraphicsDevice, skinFile));
                                 Console.WriteLine("Read skin: {0}", skinFile);
+
+                                for (int j = 0; j < model[i].header.meshCount; j++)
+                                    if (model[i].meshes[j].header.name.Equals(name))
+                                        model[i].meshes[j].texture = index;
+
+                                index++;
                             }
                         }
-                    } 
+                        skinFs.Close();
+                        i++;
+                    }
                 }
-
+                
                 fs.Close();     
             }
             catch(Exception e)
