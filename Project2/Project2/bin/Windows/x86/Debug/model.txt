@@ -1,0 +1,9 @@
+models\players\laracroft\lower.md3
+models\players\laracroft\lower_default.skin
+models\players\laracroft\upper.md3
+models\players\laracroft\upper_default.skin
+models\players\laracroft\head.md3
+models\players\laracroft\head_default.skin
+models\players\sarge\railgun.md3
+models\players\sarge\railgun.skin
+models\players\laracroft\animation.cfg

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.IO;
+using Paloma;
 
 namespace Project2
 {
@@ -9,6 +12,7 @@ namespace Project2
     /// </summary>
     public class Game1 : Game
     {
+        Model[] model = new Model[4];
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -39,6 +43,45 @@ namespace Project2
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            
+            Console.WriteLine("Enter the name of the file: ");
+            StreamReader fs = new StreamReader(Console.ReadLine());
+
+            try
+            {
+                int i = 0;
+                while(fs.Peek() > -1)
+                {
+                    string file = fs.ReadLine();
+                    if (file.Contains(".md3"))
+                    {
+                        model[i] = new Model(file);
+                        model[i].LoadModel();
+                    }
+                    else if(file.Contains(".skin"))
+                    {
+                        StreamReader skinFs = new StreamReader(file);
+                        while (skinFs.Peek() > -1)
+                        {
+                            string skinFile = skinFs.ReadLine();
+                            if (!skinFile.StartsWith("tag_"))
+                            {
+                                skinFile = skinFile.Substring(skinFile.IndexOf(',') + 1);
+                                model[i].textures.Add(Model.LoadTexture(GraphicsDevice, skinFile));
+                                Console.WriteLine("Read skin: {0}", skinFile);
+                            }
+                        }
+                    } 
+                }
+
+                fs.Close();     
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
 
             // TODO: use this.Content to load your game content here
         }

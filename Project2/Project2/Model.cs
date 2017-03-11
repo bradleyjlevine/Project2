@@ -97,16 +97,18 @@ namespace Project2
         float interpolation;
         int currentFrame;
 
-        List<Texture2D> textures;
+        public List<Texture2D> textures;
         static Vector4[,] normals;
+        string file;
+
+        public Model(string file)
+        {
+            this.file = file;
+            this.textures = new List<Texture2D>();
+        }
 
         public void LoadModel()
         {
-            string file;
-
-            Console.WriteLine("Enter the name of the model file: ");
-            file = Console.ReadLine();
-
             try
             {
                 //create binary reader
@@ -144,6 +146,8 @@ namespace Project2
                     frames[i].creator = BytesToStringOp(br.ReadBytes(16));
                 }
 
+                Console.WriteLine("Read MD3 file frames.");
+
                 //reading tags
                 br.BaseStream.Seek(header.tagOffset, SeekOrigin.Begin);
 
@@ -154,14 +158,17 @@ namespace Project2
                     tags[i].rotation = new Matrix(br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), 0,
                                                   br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), 0,
                                                   br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), 0,
-                                                  0, 0, 0, 0);
+                                                  0, 0, 0, 1);
 
                     //tags[i].rotation = Matrix.Transpose(tags[i].rotation);
                 }
 
+                Console.WriteLine("Read MD3 file tags.");
 
-                long offset = 0;
                 //reading meshes
+                br.BaseStream.Seek(header.meshOffset, SeekOrigin.Begin);
+                long meshOffset = header.meshOffset;
+
                 for (int i = 0; i < header.meshCount; i++)
                 {
                     meshes[i].header.ID = BytesToStringOp(br.ReadBytes(4));
@@ -177,14 +184,16 @@ namespace Project2
                     meshes[i].header.vertexStart = br.ReadInt32();
                     meshes[i].header.meshSize = br.ReadInt32();
 
-                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.triangleOffset + offset), SeekOrigin.Begin);
+                    //reading in triangle indexes
+                    br.BaseStream.Seek(meshes[i].header.triangleOffset + meshOffset, SeekOrigin.Begin);
 
                     meshes[i].triangleVertices = new int[meshes[i].header.triangleCount * 3];
 
-                    for (int j = 0; j < meshes[i].header.triangleCount * 3; j++)
+                    for (int j = 0; j < meshes[i].triangleVertices.Length; j++)
                         meshes[i].triangleVertices[j] = br.ReadInt32();
 
-                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.skinOffset + offset), SeekOrigin.Begin);
+                    //reading in skins
+                    br.BaseStream.Seek(meshes[i].header.skinOffset + meshOffset, SeekOrigin.Begin);
 
                     meshes[i].skins = new Skin[meshes[i].header.skinCount];
 
@@ -194,16 +203,18 @@ namespace Project2
                         meshes[i].skins[j].index = br.ReadInt32();
                     }
 
-                    br.BaseStream.Seek(((long)(SeekOrigin.Current) + meshes[i].header.textureVectorStart + offset), SeekOrigin.Begin);
+                    //reading in texture coordinates
+                    br.BaseStream.Seek(meshes[i].header.textureVectorStart + meshOffset, SeekOrigin.Begin);
 
-                    meshes[i].textureCoordinates = new Vector2[meshes[i].header.vertexCount*2];
+                    meshes[i].textureCoordinates = new Vector2[meshes[i].header.vertexCount];
 
-                    for (int j = 0; i < meshes[i].header.vertexCount * 2; i++)
+                    for (int j = 0; j < meshes[i].textureCoordinates.Length; j++)
                     {
-                        meshes[i].textureCoordinates[0] = new Vector2(br.ReadSingle(), br.ReadSingle());
+                        meshes[i].textureCoordinates[j] = new Vector2(br.ReadSingle(), br.ReadSingle());
                     }
 
-                    br.BaseStream.Seek(((long)SeekOrigin.Current) + meshes[i].header.vertexStart + offset, SeekOrigin.Begin);
+                    //reading vertices
+                    br.BaseStream.Seek(meshes[i].header.vertexStart + meshOffset, SeekOrigin.Begin);
 
                     meshes[i].vertices = new Vertex[meshes[i].header.vertexCount * meshes[i].header.frameCount];
 
@@ -215,7 +226,7 @@ namespace Project2
 
                         meshes[i].vertices[j].normal = new byte[3];
 
-                        byte lat = br.ReadByte(), lng = br.ReadByte(); ;
+                        byte lat = (byte)((float)br.ReadByte() * (2 * MathHelper.Pi) / 255), lng = (byte)((float)br.ReadByte() * (2 * MathHelper.Pi) / 255);
 
                         meshes[i].vertices[j].normal[0] = (byte)(Math.Cos(lat) * Math.Sin(lng));
                         meshes[i].vertices[j].normal[1] = (byte)(Math.Sin(lat) * Math.Sin(lng));
@@ -224,8 +235,14 @@ namespace Project2
 
                     meshes[i].texture = -1;
 
-                    offset += meshes[i].header.meshSize;
+                    meshOffset += meshes[i].header.meshSize;
+
+                    Console.WriteLine("Read Mesh {0}", i);
                 }
+
+                Console.WriteLine("Read MD3 file");
+
+                br.Close();
 
             }
             catch (IOException e)
@@ -233,6 +250,34 @@ namespace Project2
                 Console.WriteLine(e.ToString());
             }
 
+        }
+
+        public static Texture2D LoadTexture(GraphicsDevice device, string texturePath)
+        {
+            Texture2D texture;
+
+            if (texturePath.ToLower().EndsWith(".tga"))
+            {
+                TargaImage image = new TargaImage(texturePath);
+                texture = new Texture2D(device, image.Header.Width, image.Header.Height);
+                Color[] data = new Color[image.Header.Height * image.Header.Width];
+                for (int y = 0; y < image.Header.Height; y++)
+                    for (int x = 0; x < image.Header.Width; x++)
+                    {
+                        System.Drawing.Color color = image.Image.GetPixel(x, y);
+                        data[y * image.Header.Width + x] = new Color(color.R, color.G, color.B, color.A);
+                    }
+                image.Dispose();
+                texture.SetData(data);
+            }
+            else
+            {
+                FileStream stream = new FileStream(texturePath, FileMode.Open);
+                texture = Texture2D.FromStream(device, stream);
+                stream.Close();
+            }
+
+            return texture;
         }
 
         public String BytesToStringOp(byte[] b)
