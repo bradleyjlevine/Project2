@@ -12,10 +12,10 @@ namespace Project2
     /// </summary>
     public class Game1 : Game
     {
-        Model[] model = new Model[4];
+        MD3 model = new MD3();
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -43,6 +43,8 @@ namespace Project2
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            Model[] model = new Model[4];
 
             Console.WriteLine("Enter the name of the file: ");
             StreamReader fs = new StreamReader(Console.ReadLine());
@@ -85,7 +87,12 @@ namespace Project2
                     }
                 }
                 
-                fs.Close();     
+                fs.Close();
+
+                this.model.lowerModel = model[0];
+                this.model.upperModel = model[1];
+                this.model.headModel = model[2];
+                this.model.gunModel = model[3];
             }
             catch(Exception e)
             {
