@@ -56,13 +56,13 @@ namespace Project2
                 while(fs.Peek() > -1)
                 {
                     string file = fs.ReadLine();
-                    if (file.Contains(".md3"))
+                    if (file.EndsWith(".md3"))
                     {
                         model[i] = new Model();
                         model[i].LoadModel(file);
                         
                     }
-                    else if(file.Contains(".skin"))
+                    else if(file.EndsWith(".skin"))
                     {
                         StreamReader skinFs = new StreamReader(file);
                         while (skinFs.Peek() > -1)
