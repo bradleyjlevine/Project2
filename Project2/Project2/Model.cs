@@ -54,7 +54,7 @@ namespace Project2
     public struct Vertex
     {
         public Vector4 vertex;  // stored as three 2-byte shorts
-        public byte[] normal;
+        public float[] normal;
     };
 
     public struct MeshHeader
@@ -91,28 +91,26 @@ namespace Project2
         public Mesh[] meshes;
         public Model[] links;
 
-        int startFrame;
-        int endFrame;
-        int nextFrame;
-        float interpolation;
-        int currentFrame;
+        public int startFrame;
+        public int endFrame;
+        public int nextFrame;
+        public float interpolation;
+        public int currentFrame;
 
         public List<Texture2D> textures;
         static Vector4[,] normals;
-        string file;
 
-        public Model(string file)
+        public Model()
         {
-            this.file = file;
             textures = new List<Texture2D>();
         }
 
-        public void LoadModel()
+        public void LoadModel(string f)
         {
             try
             {
                 //create binary reader
-                BinaryReader br = new BinaryReader(File.Open(file, FileMode.Open));
+                BinaryReader br = new BinaryReader(File.Open(f, FileMode.Open));
 
                 //fill in the MD3 header struct
                 header.ID = BytesToStringOp(br.ReadBytes(4));
@@ -224,13 +222,13 @@ namespace Project2
                         meshes[i].vertices[j].vertex.Y = br.ReadInt16() * (1.0f / 64);
                         meshes[i].vertices[j].vertex.Z = br.ReadInt16() * (1.0f / 64);
 
-                        meshes[i].vertices[j].normal = new byte[3];
+                        meshes[i].vertices[j].normal = new float[3];
 
-                        byte lat = (byte)((float)br.ReadByte() * (2 * MathHelper.Pi) / 255), lng = (byte)((float)br.ReadByte() * (2 * MathHelper.Pi) / 255);
+                        float lat = ((float)br.ReadByte() * (2 * MathHelper.Pi) / 255), lng = ((float)br.ReadByte() * (2 * MathHelper.Pi) / 255);
 
-                        meshes[i].vertices[j].normal[0] = (byte)(Math.Cos(lat) * Math.Sin(lng));
-                        meshes[i].vertices[j].normal[1] = (byte)(Math.Sin(lat) * Math.Sin(lng));
-                        meshes[i].vertices[j].normal[2] = (byte)(Math.Cos(lng));
+                        meshes[i].vertices[j].normal[0] = (float)(Math.Cos(lat) * Math.Sin(lng));
+                        meshes[i].vertices[j].normal[1] = (float)(Math.Sin(lat) * Math.Sin(lng));
+                        meshes[i].vertices[j].normal[2] = (float)Math.Cos(lng);
                     }
 
                     meshes[i].texture = -1;

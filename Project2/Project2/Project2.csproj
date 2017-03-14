@@ -44,6 +44,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AnimationTypes.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="MD3.cs" />
     <Compile Include="Model.cs" />

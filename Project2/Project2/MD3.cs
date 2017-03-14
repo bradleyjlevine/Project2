@@ -1,57 +1,124 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using System.IO;
 
 namespace Project2
 {
-    enum AnimationTypes
+    public struct Animation
     {
-        BOTH_DEATH1 = 0,
-        BOTH_DEAD1 = 1,
-        BOTH_DEATH2 = 2,
-        BOTH_DEAD2 = 3,
-        BOTH_DEATH3 = 4,
-        BOTH_DEAD3 = 5,
-
-        TORSO_GESTURE = 6,
-        TORSO_ATTACK = 7,
-        TORSO_ATTACK2 = 8,
-        TORSO_DROP = 9,
-        TORSO_RAISE = 10,
-        TORSO_STAND = 11,
-        TORSO_STAND2 = 12,
-
-        LEGS_WALKCR = 13,
-        LEGS_WALK = 14,
-        LEGS_RUN = 15,
-        LEGS_BACK = 16,
-        LEGS_SWIM = 17,
-        LEGS_JUMP = 18,
-        LEGS_LAND = 19,
-        LEGS_JUMPB = 20,
-        LEGS_LANDB = 21,
-        LEGS_IDLE = 22,
-        LEGS_IDLECR = 23,
-        LEGS_TURN = 24,
-
-        MAX_ANIMATIONS
+        public int startFrame;
+        public int endFrame;
+        public int nextFrame;
+        public float interpolation;
+        public int fps;
+        public int currentFrame;
     };
-    class MD3
+
+    public class MD3
     {
         public Model lowerModel;
         public Model upperModel;
         public Model headModel;
         public Model gunModel;
-        //Animation[] animations;
-        int currentAnimation;
+        public Animation[] animations;
+        public int currentAnimation;
 
-        //LoadAnimation()
-        //SetAnimation()
-        //IncrementAnimation()
+        public void LoadAnimation(string f)
+        {
+            animations = new Animation[25];
+
+            try
+            {
+                //opens model.txt
+                StreamReader modelFile = new StreamReader(f);
+
+                //starts reading the model.txt file
+                while (modelFile.Peek() > -1)
+                {
+                    //gets a line
+                    string file = modelFile.ReadLine();
+
+                    //checks if it is the animation configuration file
+                    if (file.EndsWith("animation.cfg"))
+                    {
+                        StreamReader animationFile = new StreamReader(file);
+                        int i = 0;
+
+                        //starts reading the animation configuration file
+                        while (animationFile.Peek() > -1 && i < 25)
+                        {
+                            string line = animationFile.ReadLine();
+
+                            if (!line.StartsWith("//") && line.Length > 0 && Char.IsDigit(line[0]))
+                            {
+                                char[] symbol = { '\t' };
+
+                                //breaks up the line in to 4 or more tokens
+                                string[] tokens = line.Split(symbol);
+
+                                //sets the information for the animation
+                                if (tokens.Length >= 4)
+                                {
+                                    animations[i].startFrame = Convert.ToInt32(tokens[0]);
+                                    animations[i].currentFrame = animations[i].startFrame;
+                                    animations[i].nextFrame = Convert.ToInt32(animations[i].currentFrame + 1);
+                                    animations[i].endFrame = animations[i].startFrame + Convert.ToInt32(tokens[1]) - 1;
+                                    animations[i].fps = Convert.ToInt32(tokens[3]);
+                                }
+                                else
+                                {
+                                    throw new Exception("Error in file: animation.cfg");
+                                }
+
+                                i++;
+                            }
+                        }
+                    }
+                }
+
+                Console.WriteLine("Read animation.cfg");
+
+                //goes back and makes changes to LEGS_WALKCR animation
+                for (AnimationTypes i = AnimationTypes.LEGS_WALKCR; i < AnimationTypes.MAX_ANIMATIONS; i++)
+                    animations[(int)i].startFrame -= animations[(int)AnimationTypes.TORSO_GESTURE].startFrame;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+        }
+
+        public void SetAnimation(AnimationTypes a)
+        {
+            currentAnimation = (int)a;
+
+            if (a <= AnimationTypes.BOTH_DEAD3) //both models
+            {
+                lowerModel.startFrame = animations[currentAnimation].startFrame;
+                lowerModel.currentFrame = animations[currentAnimation].currentFrame;
+                lowerModel.endFrame = animations[currentAnimation].endFrame;
+                lowerModel.nextFrame = animations[currentAnimation].nextFrame;
+
+                upperModel.startFrame = animations[currentAnimation].startFrame;
+                upperModel.currentFrame = animations[currentAnimation].currentFrame;
+                upperModel.endFrame = animations[currentAnimation].endFrame;
+                upperModel.nextFrame = animations[currentAnimation].nextFrame;
+
+            }
+            else if (a > AnimationTypes.BOTH_DEAD3 && a <= AnimationTypes.TORSO_STAND2) //upper only
+            {
+                upperModel.startFrame = animations[currentAnimation].startFrame;
+                upperModel.currentFrame = animations[currentAnimation].currentFrame;
+                upperModel.endFrame = animations[currentAnimation].endFrame;
+                upperModel.nextFrame = animations[currentAnimation].nextFrame;
+            }
+            else if (a > AnimationTypes.TORSO_STAND2) //lowerModel only
+            {
+                lowerModel.startFrame = animations[currentAnimation].startFrame;
+                lowerModel.currentFrame = animations[currentAnimation].currentFrame;
+                lowerModel.endFrame = animations[currentAnimation].endFrame;
+                lowerModel.nextFrame = animations[currentAnimation].nextFrame;
+            }
+        }
     }
 }

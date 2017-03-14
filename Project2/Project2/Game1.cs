@@ -47,7 +47,8 @@ namespace Project2
             Model[] model = new Model[4];
 
             Console.WriteLine("Enter the name of the file: ");
-            StreamReader fs = new StreamReader(Console.ReadLine());
+            string modelFile = Console.ReadLine();
+            StreamReader fs = new StreamReader(modelFile);
 
             try
             {
@@ -57,8 +58,8 @@ namespace Project2
                     string file = fs.ReadLine();
                     if (file.Contains(".md3"))
                     {
-                        model[i] = new Model(file);
-                        model[i].LoadModel();
+                        model[i] = new Model();
+                        model[i].LoadModel(file);
                         
                     }
                     else if(file.Contains(".skin"))
@@ -93,6 +94,8 @@ namespace Project2
                 this.model.upperModel = model[1];
                 this.model.headModel = model[2];
                 this.model.gunModel = model[3];
+
+                this.model.LoadAnimation(modelFile);
             }
             catch(Exception e)
             {
