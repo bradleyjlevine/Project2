@@ -65,12 +65,13 @@ namespace Project2
                     else if(file.EndsWith(".skin"))
                     {
                         StreamReader skinFs = new StreamReader(file);
+
                         while (skinFs.Peek() > -1)
                         {
                             string skinFile = skinFs.ReadLine();
                             if (!skinFile.StartsWith("tag_"))
                             {
-                                string name = skinFile.Remove(skinFile.LastIndexOf(','));
+                                string name = skinFile.Remove(skinFile.IndexOf(','));
 
                                 skinFile = skinFile.Substring(skinFile.IndexOf(',') + 1);
                                 model[i].textures.Add(Model.LoadTexture(GraphicsDevice, skinFile));
