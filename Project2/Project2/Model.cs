@@ -54,7 +54,7 @@ namespace Project2
     public struct Vertex
     {
         public Vector4 vertex;  // stored as three 2-byte shorts
-        public float[] normal;
+        public byte[] normal;
     };
 
     public struct MeshHeader
@@ -98,7 +98,7 @@ namespace Project2
         public int currentFrame;
 
         public List<Texture2D> textures;
-        static Vector4[,] normals;
+        static Vector4[,] normals = new Vector4[256, 256];
 
         public Model()
         {
@@ -222,13 +222,10 @@ namespace Project2
                         meshes[i].vertices[j].vertex.Y = br.ReadInt16() * (1.0f / 64);
                         meshes[i].vertices[j].vertex.Z = br.ReadInt16() * (1.0f / 64);
 
-                        meshes[i].vertices[j].normal = new float[3];
+                        meshes[i].vertices[j].normal = new float[2];
 
-                        float lat = ((float)br.ReadByte() * (2 * MathHelper.Pi) / 255), lng = ((float)br.ReadByte() * (2 * MathHelper.Pi) / 255);
-
-                        meshes[i].vertices[j].normal[0] = (float)(Math.Cos(lat) * Math.Sin(lng));
-                        meshes[i].vertices[j].normal[1] = (float)(Math.Sin(lat) * Math.Sin(lng));
-                        meshes[i].vertices[j].normal[2] = (float)Math.Cos(lng);
+                        meshes[i].vertices[j].normal[0] = br.ReadByte();
+                        meshes[i].vertices[j].normal[1] = br.ReadByte();
                     }
 
                     meshes[i].texture = -1;
@@ -276,6 +273,21 @@ namespace Project2
             }
 
             return texture;
+        }
+
+        public static void SetUp()
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                for (int j = 0; j < 256; j++)
+                {
+                    float alpha = (float)(2.0 * i * Math.PI / 255);
+                    float beta = (float)(2.0 * j * Math.PI / 255);
+                    normals[i, j].X = (float)(Math.Cos(beta) * Math.Sin(alpha));
+                    normals[i, j].Y = (float)(Math.Sin(beta) * Math.Sin(alpha));
+                    normals[i, j].Z = (float)(Math.Cos(alpha));
+                }
+            }
         }
 
         public String BytesToStringOp(byte[] b)

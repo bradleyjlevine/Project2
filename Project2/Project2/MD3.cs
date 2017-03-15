@@ -72,6 +72,8 @@ namespace Project2
                                 i++;
                             }
                         }
+
+                        animationFile.Close();
                     }
                 }
 
@@ -80,6 +82,8 @@ namespace Project2
                 //goes back and makes changes to LEGS_WALKCR animation
                 for (AnimationTypes i = AnimationTypes.LEGS_WALKCR; i < AnimationTypes.MAX_ANIMATIONS; i++)
                     animations[(int)i].startFrame -= animations[(int)AnimationTypes.TORSO_GESTURE].startFrame;
+
+                modelFile.Close();
             }
             catch (Exception e)
             {
