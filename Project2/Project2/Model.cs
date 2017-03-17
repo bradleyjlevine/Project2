@@ -157,8 +157,6 @@ namespace Project2
                                                   br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), 0,
                                                   br.ReadSingle(), br.ReadSingle(), br.ReadSingle(), 0,
                                                   0, 0, 0, 1);
-
-                    //tags[i].rotation = Matrix.Transpose(tags[i].rotation);
                 }
 
                 Console.WriteLine("Read MD3 file tags.");

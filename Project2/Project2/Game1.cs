@@ -39,7 +39,11 @@ namespace Project2
             basicEffect.AmbientLightColor = new Vector3(0.2f, 0.2f, 0.2f);
             basicEffect.DirectionalLight0.SpecularColor = new Vector3(0.5f, 0.5f, 0.5f);
             basicEffect.DirectionalLight0.Direction = new Vector3(MathHelper.ToRadians(-45f), MathHelper.ToRadians(20f), MathHelper.ToRadians(30f));
+            basicEffect.Texture = this.model.lowerModel.textures.
             basicEffect.TextureEnabled = true;
+            basicEffect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 1f, 1000f);
+            basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, -200f), new Vector3(0, 0, 0), Vector3.Up);
+            basicEffect.World = Matrix.CreateWorld(new Vector3(0, 0, -100f), Vector3.Forward, Vector3.Up);
 
             base.Initialize();
         }
