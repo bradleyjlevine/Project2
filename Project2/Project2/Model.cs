@@ -98,7 +98,7 @@ namespace Project2
         public int currentFrame;
 
         public List<Texture2D> textures;
-        static Vector4[,] normals = new Vector4[256, 256];
+        public static Vector4[,] normals = new Vector4[256, 256];
 
         public Model()
         {

@@ -24,9 +24,6 @@ namespace Project2
         public Animation[] animations;
         public int currentAnimation;
 
-        Matrix current = Matrix.Identity;
-        Matrix next = Matrix.Identity;
-
         public void LoadAnimation(string f)
         {
             animations = new Animation[25];
@@ -135,21 +132,22 @@ namespace Project2
 
         }
 
-        public void Render(BasicEffect basicEffect)
+        public void Render(BasicEffect basicEffect, GraphicsDevice GraphicsDevice)
         {
-            DrawAllModels(lowerModel, current, next);
+            Matrix currentMatrix = Matrix.Identity;
+            Matrix nextMatrix = Matrix.Identity;
+            DrawAllModels(basicEffect, lowerModel, currentMatrix, nextMatrix, GraphicsDevice);
         }
 
-        public void DrawAllModels(Model lowModel, Matrix currentMatrix, Matrix nextMatrix)
+        public void DrawAllModels(BasicEffect basicEffect, Model lowModel, Matrix currentMatrix, Matrix nextMatrix, GraphicsDevice GraphicsDevice)
         {
-            DrawModel(lowModel, currentMatrix, nextMatrix);
+            DrawModel(basicEffect, lowModel, currentMatrix, nextMatrix, GraphicsDevice);
         }
 
-        public void DrawModel(Model currentModel, Matrix currentMatrix, Matrix nextMatrix)
+        public void DrawModel(BasicEffect basicEffect, Model currentModel, Matrix currentMatrix, Matrix nextMatrix, GraphicsDevice GraphicsDevice)
         {
             VertexPositionNormalTexture[] meshVertices;
             Texture2D currentTexture;
-            VertexPositionNormalTexture[] currentMeshVertices;
             int currentOffset, nextOffset;
 
             for(int i=0; i<currentModel.meshes.Length; i++)
@@ -159,15 +157,48 @@ namespace Project2
                     currentTexture = currentModel.textures[currentModel.meshes[i].texture];
                     currentOffset = currentModel.currentFrame * (currentModel.meshes[i].header.vertexCount);
                     nextOffset = currentModel.nextFrame * (currentModel.meshes[i].header.vertexCount);
+                    meshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount*3];
 
-                    currentMeshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount*3];
-                    for(int triangleNumber = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
+                    for (int triangleNumber = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
                     {
                         for(int vertexNumber=0; vertexNumber<3; vertexNumber++)
                         {
+                            int currentVertex = triangleNumber * 3 + vertexNumber;
+                            Vector4 shortcutVertex1 = currentModel.meshes[i].vertices[currentVertex + currentOffset].vertex;
+                            Vector3 currentVertexPos = new Vector3(shortcutVertex1.X, shortcutVertex1.Y, shortcutVertex1.Z);
+                            Vector4 shortcutVertex2 = currentModel.meshes[i].vertices[currentVertex + nextOffset].vertex;
+                            Vector3 nextVertexPos = new Vector3(shortcutVertex2.X, shortcutVertex2.Y, shortcutVertex2.Z);
 
+                            currentVertexPos = Vector3.Transform(currentVertexPos, currentMatrix);
+                            nextVertexPos = Vector3.Transform(nextVertexPos, nextMatrix);
+
+                            int currentNormalIndex0 = currentModel.meshes[i].vertices[currentVertex + currentOffset].normal[0];
+                            int currentNormalIndex1 = currentModel.meshes[i].vertices[currentVertex + currentOffset].normal[1];
+                            Vector3 currentNormal = new Vector3(Model.normals[currentNormalIndex0, currentNormalIndex1].X, Model.normals[currentNormalIndex0, currentNormalIndex1].Y, Model.normals[currentNormalIndex0, currentNormalIndex1].Z);
+
+                            int nextNormalIndex0 = currentModel.meshes[i].vertices[currentVertex + nextOffset].normal[0];
+                            int nextNormalIndex1 = currentModel.meshes[i].vertices[currentVertex + nextOffset].normal[1];
+                            Vector3 nextNormal = new Vector3(Model.normals[nextNormalIndex0, nextNormalIndex1].X, Model.normals[nextNormalIndex0, nextNormalIndex1].Y, Model.normals[nextNormalIndex0, nextNormalIndex1].Z);
+
+                            currentNormal = Vector3.TransformNormal(currentNormal, currentMatrix);
+                            nextNormal = Vector3.TransformNormal(nextNormal, nextMatrix);
+
+                            Vector3 finalVertexPos = Vector3.Lerp(currentVertexPos, nextVertexPos, 0.5f);
+                            Vector3 finalNormal = Vector3.Lerp(currentNormal, nextNormal, 0.5f);
+
+                            meshVertices[currentVertex] = new VertexPositionNormalTexture(finalVertexPos, finalNormal, currentModel.meshes[i].textureCoordinates[currentVertex + currentOffset]);
                         }
                     }
+                    VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionNormalTexture), meshVertices.Length, BufferUsage.WriteOnly);
+                    vertexBuffer.SetData(meshVertices);
+                    GraphicsDevice.SetVertexBuffer(vertexBuffer);
+
+                    foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
+                    {
+                        pass.Apply();
+                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, meshVertices, 0, meshVertices.Length);
+                    }
+
                 }
 
 

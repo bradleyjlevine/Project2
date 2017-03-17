@@ -148,7 +148,7 @@ namespace Project2
         {
             MD3 md3 = new MD3();
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            md3.Render(basicEffect);
+            md3.Render(basicEffect, GraphicsDevice);
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
