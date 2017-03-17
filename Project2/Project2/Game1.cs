@@ -146,8 +146,9 @@ namespace Project2
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            MD3 md3 = new MD3();
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            MD3.Render(basicEffect);
+            md3.Render(basicEffect);
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);

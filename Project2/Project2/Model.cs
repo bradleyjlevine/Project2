@@ -222,7 +222,7 @@ namespace Project2
                         meshes[i].vertices[j].vertex.Y = br.ReadInt16() * (1.0f / 64);
                         meshes[i].vertices[j].vertex.Z = br.ReadInt16() * (1.0f / 64);
 
-                        meshes[i].vertices[j].normal = new float[2];
+                        meshes[i].vertices[j].normal = new byte[2];
 
                         meshes[i].vertices[j].normal[0] = br.ReadByte();
                         meshes[i].vertices[j].normal[1] = br.ReadByte();

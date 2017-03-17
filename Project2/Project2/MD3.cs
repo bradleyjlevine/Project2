@@ -140,16 +140,38 @@ namespace Project2
             DrawAllModels(lowerModel, current, next);
         }
 
-        public void DrawAllModels(Model lowModel, Matrix current, Matrix next)
+        public void DrawAllModels(Model lowModel, Matrix currentMatrix, Matrix nextMatrix)
         {
-            DrawModel();
+            DrawModel(lowModel, currentMatrix, nextMatrix);
         }
 
-        public void DrawModel()
+        public void DrawModel(Model currentModel, Matrix currentMatrix, Matrix nextMatrix)
         {
             VertexPositionNormalTexture[] meshVertices;
+            Texture2D currentTexture;
+            VertexPositionNormalTexture[] currentMeshVertices;
+            int currentOffset, nextOffset;
+
+            for(int i=0; i<currentModel.meshes.Length; i++)
+            {
+                if (currentModel.meshes[i].texture != -1)
+                {
+                    currentTexture = currentModel.textures[currentModel.meshes[i].texture];
+                    currentOffset = currentModel.currentFrame * (currentModel.meshes[i].header.vertexCount);
+                    nextOffset = currentModel.nextFrame * (currentModel.meshes[i].header.vertexCount);
+
+                    currentMeshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount*3];
+                    for(int triangleNumber = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
+                    {
+                        for(int vertexNumber=0; vertexNumber<3; vertexNumber++)
+                        {
+
+                        }
+                    }
+                }
 
 
+            }
         }
     }
 }
