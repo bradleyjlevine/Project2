@@ -159,9 +159,9 @@ namespace Project2
                     nextOffset = currentModel.nextFrame * (currentModel.meshes[i].header.vertexCount);
                     meshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount*3];
 
-                    for (int triangleNumber = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
+                    for (int triangleNumber = 0, k = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
                     {
-                        for(int vertexNumber=0; vertexNumber<3; vertexNumber++)
+                        for(int vertexNumber=0; vertexNumber<3; vertexNumber++, k++)
                         {
                             int currentVertex = triangleNumber * 3 + vertexNumber;
                             Vector4 shortcutVertex1 = currentModel.meshes[i].vertices[currentVertex + currentOffset].vertex;
@@ -186,7 +186,8 @@ namespace Project2
                             Vector3 finalVertexPos = Vector3.Lerp(currentVertexPos, nextVertexPos, 0.5f);
                             Vector3 finalNormal = Vector3.Lerp(currentNormal, nextNormal, 0.5f);
 
-                            meshVertices[currentVertex] = new VertexPositionNormalTexture(finalVertexPos, finalNormal, currentModel.meshes[i].textureCoordinates[currentVertex + currentOffset]);
+                            //i believe this is what we want
+                            meshVertices[currentVertex] = new VertexPositionNormalTexture(finalVertexPos, finalNormal, currentModel.meshes[i].textureCoordinates[currentModel.meshes[i].triangleVertices[k]]);
                         }
                     }
                     VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionNormalTexture), meshVertices.Length, BufferUsage.WriteOnly);
@@ -196,7 +197,7 @@ namespace Project2
                     foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
                     {
                         pass.Apply();
-                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, meshVertices, 0, meshVertices.Length);
+                        GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, meshVertices, 0, meshVertices.Length / 3);
                     }
 
                 }
