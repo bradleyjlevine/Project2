@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.IO;
 
 namespace Project2
@@ -21,6 +23,9 @@ namespace Project2
         public Model gunModel;
         public Animation[] animations;
         public int currentAnimation;
+
+        Matrix current = Matrix.Identity;
+        Matrix next = Matrix.Identity;
 
         public void LoadAnimation(string f)
         {
@@ -123,6 +128,28 @@ namespace Project2
                 lowerModel.endFrame = animations[currentAnimation].endFrame;
                 lowerModel.nextFrame = animations[currentAnimation].nextFrame;
             }
+        }
+
+        public void Update()
+        {
+
+        }
+
+        public void Render(BasicEffect basicEffect)
+        {
+            DrawAllModels(lowerModel, current, next);
+        }
+
+        public void DrawAllModels(Model lowModel, Matrix current, Matrix next)
+        {
+            DrawModel();
+        }
+
+        public void DrawModel()
+        {
+            VertexPositionNormalTexture[] meshVertices;
+
+
         }
     }
 }

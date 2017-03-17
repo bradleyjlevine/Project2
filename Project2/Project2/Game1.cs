@@ -15,6 +15,7 @@ namespace Project2
         MD3 model = new MD3();
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        BasicEffect basicEffect;
         
         public Game1()
         {
@@ -31,6 +32,14 @@ namespace Project2
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            basicEffect = new BasicEffect(GraphicsDevice);
+            basicEffect.Alpha = 1.0f;
+            basicEffect.LightingEnabled = true;
+            basicEffect.DirectionalLight0.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);
+            basicEffect.AmbientLightColor = new Vector3(0.2f, 0.2f, 0.2f);
+            basicEffect.DirectionalLight0.SpecularColor = new Vector3(0.5f, 0.5f, 0.5f);
+            basicEffect.DirectionalLight0.Direction = new Vector3(MathHelper.ToRadians(-45f), MathHelper.ToRadians(20f), MathHelper.ToRadians(30f));
+            basicEffect.TextureEnabled = true;
 
             base.Initialize();
         }
@@ -138,7 +147,7 @@ namespace Project2
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            MD3.Render(basicEffect);
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);

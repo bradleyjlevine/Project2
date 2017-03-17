@@ -21,3 +21,5 @@ C:\Users\Bradley\Source\Repos\Project2\Project2\Project2\bin\Windows\x86\Debug\S
 C:\Users\Bradley\Source\Repos\Project2\Project2\Project2\obj\x86\Debug\Project2.csprojResolveAssemblyReference.cache
 C:\Users\Bradley\Source\Repos\Project2\Project2\Project2\obj\x86\Debug\Project2.exe
 C:\Users\Bradley\Source\Repos\Project2\Project2\Project2\obj\x86\Debug\Project2.pdb
+C:\Users\Gamuray\Source\Repos\Project2\Project2\Project2\obj\x86\Debug\Project2.exe
+C:\Users\Gamuray\Source\Repos\Project2\Project2\Project2\obj\x86\Debug\Project2.pdb
