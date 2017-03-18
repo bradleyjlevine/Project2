@@ -39,11 +39,7 @@ namespace Project2
             basicEffect.AmbientLightColor = new Vector3(0.2f, 0.2f, 0.2f);
             basicEffect.DirectionalLight0.SpecularColor = new Vector3(0.5f, 0.5f, 0.5f);
             basicEffect.DirectionalLight0.Direction = new Vector3(MathHelper.ToRadians(-45f), MathHelper.ToRadians(20f), MathHelper.ToRadians(30f));
-            basicEffect.Texture = this.model.lowerModel.textures.
             basicEffect.TextureEnabled = true;
-            basicEffect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 1f, 1000f);
-            basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, -200f), new Vector3(0, 0, 0), Vector3.Up);
-            basicEffect.World = Matrix.CreateWorld(new Vector3(0, 0, -100f), Vector3.Forward, Vector3.Up);
 
             base.Initialize();
         }
@@ -66,16 +62,16 @@ namespace Project2
             try
             {
                 int i = 0, index = 0;
-                while(fs.Peek() > -1)
+                while (fs.Peek() > -1)
                 {
                     string file = fs.ReadLine();
                     if (file.EndsWith(".md3"))
                     {
                         model[i] = new Model();
                         model[i].LoadModel(file);
-                        
+
                     }
-                    else if(file.EndsWith(".skin"))
+                    else if (file.EndsWith(".skin"))
                     {
                         StreamReader skinFs = new StreamReader(file);
 
@@ -101,7 +97,7 @@ namespace Project2
                         i++;
                     }
                 }
-                
+
                 fs.Close();
 
                 this.model.lowerModel = model[0];
@@ -110,15 +106,20 @@ namespace Project2
                 this.model.gunModel = model[3];
 
                 this.model.LoadAnimation(modelFile);
+
+                this.model.lowerModel.Link("tag_torso", this.model.upperModel);
+                this.model.upperModel.Link("tag_head", this.model.headModel);
+                this.model.upperModel.Link("tag_weapon", this.model.gunModel);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-            
+
 
             // TODO: use this.Content to load your game content here
         }
+
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload

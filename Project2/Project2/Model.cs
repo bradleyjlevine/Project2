@@ -295,5 +295,15 @@ namespace Project2
                 s += (char)b[i];
             return s;
         }
+
+        public void Link(string tagName, Model m)
+        {
+            for (int i = 0; i < tags.Length; i++)
+                if (tags[i].Equals(tagName))
+                    links[i] = m;
+                else
+                    links[i] = null;
+        }
+
     }
 }

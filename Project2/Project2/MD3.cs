@@ -193,9 +193,14 @@ namespace Project2
                     VertexBuffer vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionNormalTexture), meshVertices.Length, BufferUsage.WriteOnly);
                     vertexBuffer.SetData(meshVertices);
                     GraphicsDevice.SetVertexBuffer(vertexBuffer);
+                    basicEffect.Texture = currentTexture;
 
                     foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
                     {
+                        basicEffect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 1f, 1000f);
+                        basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, -200f), new Vector3(0, 0, 0), Vector3.Up);
+                        basicEffect.World = Matrix.CreateWorld(new Vector3(0, 0, -100f), Vector3.Forward, Vector3.Up);
+
                         pass.Apply();
                         GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, meshVertices, 0, meshVertices.Length / 3);
                     }
