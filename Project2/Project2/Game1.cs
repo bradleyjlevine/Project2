@@ -41,6 +41,10 @@ namespace Project2
             basicEffect.DirectionalLight0.Direction = new Vector3(MathHelper.ToRadians(-45f), MathHelper.ToRadians(20f), MathHelper.ToRadians(30f));
             basicEffect.TextureEnabled = true;
 
+            basicEffect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 1f, 1000f);
+            basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, -200f), new Vector3(0, 0, 0), Vector3.Up);
+            basicEffect.World = Matrix.CreateWorld(new Vector3(0, 0, -100f), Vector3.Forward, Vector3.Up);
+
             base.Initialize();
         }
 
@@ -137,6 +141,53 @@ namespace Project2
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            
+            //Translation Controls (W=forward, A=left, S=back, D=right, Q=up, E=down
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+            if (Keyboard.GetState().IsKeyDown(Keys.W))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(0, 0, 1);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(0, 0, -1);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(1, 0, 0);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(-1, 0, 0);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Q))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(0, -1, 0);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.E))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateTranslation(0, 1, 0);
+            }
+
+
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateRotationY(-0.05f);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateRotationY(0.05f);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateRotationX(-0.05f);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                basicEffect.View = basicEffect.View * Matrix.CreateRotationX(+0.05f);
+            }
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -153,6 +204,7 @@ namespace Project2
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            model.Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             model.Render(basicEffect, GraphicsDevice);
             // TODO: Add your drawing code here
 

@@ -127,9 +127,25 @@ namespace Project2
             }
         }
 
-        public void Update()
+        public void Update(float elapsedSeconds)
         {
+            float frameFraction = elapsedSeconds * animations[currentAnimation].fps;
+            UpdateFrame(lowerModel, frameFraction);
+        }
 
+        public void UpdateFrame(Model currentModel, float frameFraction)
+        {
+            currentModel.interpolation = currentModel.interpolation + frameFraction;
+            if (currentModel.interpolation > 1)
+            {
+                currentModel.interpolation = 0;
+                currentModel.currentFrame = currentModel.nextFrame;
+                currentModel.nextFrame++;
+                if (currentModel.nextFrame > currentModel.endFrame)
+                {
+                    currentModel.nextFrame = currentModel.startFrame;
+                }
+            }
         }
 
         public void Render(BasicEffect basicEffect, GraphicsDevice GraphicsDevice)
@@ -139,9 +155,24 @@ namespace Project2
             DrawAllModels(basicEffect, lowerModel, currentMatrix, nextMatrix, GraphicsDevice);
         }
 
-        public void DrawAllModels(BasicEffect basicEffect, Model lowModel, Matrix currentMatrix, Matrix nextMatrix, GraphicsDevice GraphicsDevice)
+        public void DrawAllModels(BasicEffect basicEffect, Model currentModel, Matrix currentMatrix, Matrix nextMatrix, GraphicsDevice GraphicsDevice)
         {
-            DrawModel(basicEffect, lowModel, currentMatrix, nextMatrix, GraphicsDevice);
+            DrawModel(basicEffect, currentModel, currentMatrix, nextMatrix, GraphicsDevice);
+            for (int k = 0; k < currentModel.tags.Length; k++)
+            {
+                if (currentModel.links != null)
+                {
+                    if (currentModel.links[k] != null)
+                    {
+                        int currentTag = currentModel.currentFrame * currentModel.tags.Length + k;
+                        int nextTag = currentModel.nextFrame * currentModel.tags.Length + k;
+
+                        currentMatrix = currentModel.tags[currentTag].rotation * currentMatrix;
+                        nextMatrix = currentModel.tags[nextTag].rotation * nextMatrix;
+                        DrawAllModels(basicEffect, currentModel.links[k], currentMatrix, nextMatrix, GraphicsDevice);
+                    }
+                }
+            }
         }
 
         public void DrawModel(BasicEffect basicEffect, Model currentModel, Matrix currentMatrix, Matrix nextMatrix, GraphicsDevice GraphicsDevice)
@@ -150,18 +181,18 @@ namespace Project2
             Texture2D currentTexture;
             int currentOffset, nextOffset;
 
-            for(int i=0; i<currentModel.meshes.Length; i++)
+            for (int i = 0; i < currentModel.meshes.Length; i++)
             {
                 if (currentModel.meshes[i].texture != -1)
                 {
-                    currentTexture = currentModel.textures[currentModel.meshes[i].texture];
+                    currentTexture = currentModel.textures[i];
                     currentOffset = currentModel.currentFrame * (currentModel.meshes[i].header.vertexCount);
                     nextOffset = currentModel.nextFrame * (currentModel.meshes[i].header.vertexCount);
-                    meshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount*3];
+                    meshVertices = new VertexPositionNormalTexture[currentModel.meshes[i].header.triangleCount * 3];
 
                     for (int triangleNumber = 0, k = 0; triangleNumber < currentModel.meshes[i].header.triangleCount; triangleNumber++)
                     {
-                        for(int vertexNumber=0; vertexNumber<3; vertexNumber++, k++)
+                        for (int vertexNumber = 0; vertexNumber < 3; vertexNumber++, k++)
                         {
                             int currentVertex = triangleNumber * 3 + vertexNumber;
                             Vector4 shortcutVertex1 = currentModel.meshes[i].vertices[currentVertex + currentOffset].vertex;
@@ -195,12 +226,8 @@ namespace Project2
                     GraphicsDevice.SetVertexBuffer(vertexBuffer);
                     basicEffect.Texture = currentTexture;
 
-                    foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
+                    foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
                     {
-                        basicEffect.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 1f, 1000f);
-                        basicEffect.View = Matrix.CreateLookAt(new Vector3(0, 0, -200f), new Vector3(0, 0, 0), Vector3.Up);
-                        basicEffect.World = Matrix.CreateWorld(new Vector3(0, 0, -100f), Vector3.Forward, Vector3.Up);
-
                         pass.Apply();
                         GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, meshVertices, 0, meshVertices.Length / 3);
                     }

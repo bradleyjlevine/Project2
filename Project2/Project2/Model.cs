@@ -301,8 +301,8 @@ namespace Project2
             for (int i = 0; i < tags.Length; i++)
                 if (tags[i].Equals(tagName))
                     links[i] = m;
-                else
-                    links[i] = null;
+                //else
+                //    links[i] = null;
         }
 
     }
