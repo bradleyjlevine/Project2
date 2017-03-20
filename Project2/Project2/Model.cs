@@ -1,6 +1,9 @@
 ﻿/*
- * 
-*/
+ * Authors:  Bradley Levine and Aidan Helm
+ * Project 2:  Quaking in Your Boots
+ * Files: Game1.cs, Program.cs, Model.cs, MD3.cs, TargaImage.cs, AnimationTypes.cs
+ */
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -210,7 +213,7 @@ namespace Project2
                         meshes[i].textureCoordinates[j] = new Vector2(br.ReadSingle(), br.ReadSingle());
                     }
 
-                    //reading vertices
+                    //reading vertices and normals
                     br.BaseStream.Seek(meshes[i].header.vertexStart + meshOffset, SeekOrigin.Begin);
 
                     meshes[i].vertices = new Vertex[meshes[i].header.vertexCount * meshes[i].header.frameCount];
@@ -274,6 +277,7 @@ namespace Project2
             return texture;
         }
 
+        //creats lookup table for noramls
         public static void SetUp()
         {
             for (int i = 0; i < 256; i++)
@@ -289,6 +293,7 @@ namespace Project2
             }
         }
 
+        //converts a array of bytes into a string of the opropriate size
         public String BytesToStringOp(byte[] b)
         {
             string s = null;

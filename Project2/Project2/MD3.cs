@@ -1,4 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿/*
+ * Authors:  Bradley Levine and Aidan Helm
+ * Project 2:  Quaking in Your Boots
+ * Files: Game1.cs, Program.cs, Model.cs, MD3.cs, TargaImage.cs, AnimationTypes.cs
+ */
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;

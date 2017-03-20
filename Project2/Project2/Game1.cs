@@ -1,4 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿/*
+ * Authors:  Bradley Levine and Aidan Helm
+ * Project 2:  Quaking in Your Boots
+ * Files: Game1.cs, Program.cs, Model.cs, MD3.cs, TargaImage.cs, AnimationTypes.cs
+ */
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -12,12 +18,14 @@ namespace Project2
     /// </summary>
     public class Game1 : Game
     {
+        //global variables
         MD3 model = new MD3();
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         BasicEffect basicEffect;
         bool TEST = false;
         
+        //constructor
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -60,10 +68,12 @@ namespace Project2
 
             Model[] model = new Model[4];
 
+            //gets file from user to load models
             Console.WriteLine("Enter the name of the file: ");
             string modelFile = Console.ReadLine();
             StreamReader fs = new StreamReader(modelFile);
 
+            //starts reading file and looks for .md3 and .skin files
             try
             {
                 int i = 0, index = 0;
@@ -105,13 +115,16 @@ namespace Project2
 
                 fs.Close();
 
+                //copies over the models into MD3 object
                 this.model.lowerModel = model[0];
                 this.model.upperModel = model[1];
                 this.model.headModel = model[2];
                 this.model.gunModel = model[3];
 
+                //loads the animations 
                 this.model.LoadAnimation(modelFile);
 
+                //links the models
                 this.model.lowerModel.Link("tag_torso", this.model.upperModel);
                 this.model.upperModel.Link("tag_head", this.model.headModel);
                 this.model.upperModel.Link("tag_weapon", this.model.gunModel);
@@ -205,6 +218,7 @@ namespace Project2
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            //draws model
             model.Update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             model.Render(basicEffect, GraphicsDevice);
             // TODO: Add your drawing code here
