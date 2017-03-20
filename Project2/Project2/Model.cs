@@ -99,6 +99,7 @@ namespace Project2
 
         public List<Texture2D> textures;
         public static Vector4[,] normals = new Vector4[256, 256];
+        bool TEST = false;
 
         public Model()
         {
@@ -126,7 +127,7 @@ namespace Project2
                 header.meshOffset = br.ReadInt32();
                 header.fileSize = br.ReadInt32();
 
-                Console.WriteLine("Read MD3 file header.");
+                if(TEST)Console.WriteLine("Read MD3 file header.");
 
                 frames = new Frame[header.frameCount];
                 tags = new Tag[header.frameCount * header.tagCount];
@@ -144,7 +145,7 @@ namespace Project2
                     frames[i].creator = BytesToStringOp(br.ReadBytes(16));
                 }
 
-                Console.WriteLine("Read MD3 file frames.");
+                if(TEST)Console.WriteLine("Read MD3 file frames.");
 
                 //reading tags
                 br.BaseStream.Seek(header.tagOffset, SeekOrigin.Begin);
@@ -159,7 +160,7 @@ namespace Project2
                                                   0, 0, 0, 1);
                 }
 
-                Console.WriteLine("Read MD3 file tags.");
+                if(TEST)Console.WriteLine("Read MD3 file tags.");
 
                 //reading meshes
                 br.BaseStream.Seek(header.meshOffset, SeekOrigin.Begin);
@@ -230,10 +231,10 @@ namespace Project2
 
                     meshOffset += meshes[i].header.meshSize;
 
-                    Console.WriteLine("Read Mesh {0}", i);
+                    if(TEST)Console.WriteLine("Read Mesh {0}", i);
                 }
 
-                Console.WriteLine("Read MD3 file");
+                if(TEST)Console.WriteLine("Read MD3 file");
 
                 br.Close();
 
@@ -301,8 +302,6 @@ namespace Project2
             for (int i = 0; i < tags.Length; i++)
                 if (tags[i].Equals(tagName))
                     links[i] = m;
-                //else
-                //    links[i] = null;
         }
 
     }

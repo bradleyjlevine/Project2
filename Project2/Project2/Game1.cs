@@ -16,6 +16,7 @@ namespace Project2
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         BasicEffect basicEffect;
+        bool TEST = false;
         
         public Game1()
         {
@@ -88,7 +89,7 @@ namespace Project2
 
                                 skinFile = skinFile.Substring(skinFile.IndexOf(',') + 1);
                                 model[i].textures.Add(Model.LoadTexture(GraphicsDevice, skinFile));
-                                Console.WriteLine("Read skin: {0}", skinFile);
+                                if(TEST)Console.WriteLine("Read skin: {0}", skinFile);
 
                                 for (int j = 0; j < model[i].header.meshCount; j++)
                                     if (model[i].meshes[j].header.name.Equals(name))

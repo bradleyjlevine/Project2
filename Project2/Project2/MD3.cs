@@ -23,6 +23,7 @@ namespace Project2
         public Model gunModel;
         public Animation[] animations;
         public int currentAnimation;
+        bool TEST = false;
 
         public void LoadAnimation(string f)
         {
@@ -79,7 +80,7 @@ namespace Project2
                     }
                 }
 
-                Console.WriteLine("Read animation.cfg");
+                if(TEST)Console.WriteLine("Read animation.cfg");
 
                 //goes back and makes changes to LEGS_WALKCR animation
                 for (AnimationTypes i = AnimationTypes.LEGS_WALKCR; i < AnimationTypes.MAX_ANIMATIONS; i++)
